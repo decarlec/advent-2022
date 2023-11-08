@@ -1,41 +1,34 @@
 use std::{fs::File, io::BufReader, io::prelude::*};
 
-
-
 fn main() {
     calc();
 }
 
 fn calc()  {
+
+    //read elf list
     let file = File::open("cals.txt").unwrap();
     let reader = BufReader::new(file);
-
     let lines_iter = reader.lines().map(|l| l.unwrap());
-
     let mut elves : Vec<i32> = Vec::new();
 
-    //let mut elf_index = 0;
+    
     let mut sum : i32 = 0;
     for line in lines_iter {
         //Add elf to list
         if line.len() == 0{
-            println!("adding elf {}", sum);
             elves.push(sum);
-            //elf_index += 1;
             sum = 0;
         } else
         {
-
-        //Add amount to elf
-        let amt = line.parse::<i32>().unwrap();
-        sum = sum + amt;  
-        //println!("{}", sum);
+            //Add amount to elf
+            let amt = line.parse::<i32>().unwrap();
+            sum = sum + amt;  
         }
-
     }
 
+    // find the elf kings
     let mut elf_kings : i32 = 0; 
-
     for _ in 0..3 {
         let (king, cals) = remove_king(&mut elves);
         elf_kings = elf_kings + cals;
