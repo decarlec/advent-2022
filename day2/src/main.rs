@@ -30,11 +30,21 @@ impl FromStr for Move {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "A" => Ok(Move::Rock),
-            "X" => Ok(Move::Rock),
             "B" => Ok(Move::Paper),
-            "Y" => Ok(Move::Paper),
             "C" => Ok(Move::Scissors),
-            "Z" => Ok(Move::Scissors),
+            _ => Err(()),
+        }
+    }
+}
+
+impl FromStr for Outcome {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "X" => Ok(Outcome::Lose),
+            "Y" => Ok(Outcome::Draw),
+            "Z" => Ok(Outcome::Win),
             _ => Err(()),
         }
     }
@@ -50,39 +60,43 @@ fn main() {
     for line in lines_iter {
         let split : Vec<&str> = line.split_whitespace().collect();
         let move1 = Move::from_str(split[0]).unwrap();
-        let move2 = match move1 {
-            Move::Rock => Move::Paper,
-            Move::Paper => Move::Rock,
-            Move::Scissors => Move::Scissors
-        };
-        let game = Game { move1: move1, move2: move2 };
+        let out_come = Outcome::from_str(split[1]).unwrap(); 
+
+        let move2 = calc_move(&move1, out_come);
+
+    let game = Game { move1: move1, move2: move2 };
         let (p1_res, p2_res) = game.calc_score();
         p1_score += p1_res;
         p2_score += p2_res;
     }
     println!("Results \n Player 1: {0} pts \n Player 2: {1} pts ", p1_score, p2_score);
-    real_game();
 }
 
-fn real_game() {
-    let file = File::open("input.txt").unwrap();
-    let reader = BufReader::new(file);
-    let lines_iter = reader.lines().map(|l| l.unwrap());
-    let mut p1_score = 0;
-    let mut p2_score = 0;
-
-    for line in lines_iter {
-        let split : Vec<&str> = line.split_whitespace().collect();
-        let game = Game { move1:  Move::from_str(split[0]).unwrap(), move2: Move::from_str(split[1]).unwrap()};
-        let (p1_res, p2_res) = game.calc_score();
-        p1_score += p1_res;
-        p2_score += p2_res;
+fn calc_move(opp : &Move, out : Outcome) -> Move {
+    match out {
+        Outcome::Win => {
+            match opp {
+                Move::Rock => Move::Paper,
+                Move::Paper => Move::Scissors,
+                Move::Scissors => Move::Rock
+            }
+        },
+        Outcome::Lose => {
+            match opp {
+                Move::Rock => Move::Scissors,
+                Move::Paper => Move::Rock,
+                Move::Scissors => Move::Paper
+            }
+        }
+        Outcome::Draw => {
+            //TODO: fix this
+            match opp {
+                Move::Rock => Move::Rock,
+                Move::Paper => Move::Paper,
+                Move::Scissors => Move::Scissors
+            }
+        }
     }
-    println!("Results \n Player 1: {0} pts \n Player 2: {1} pts ", p1_score, p2_score)
-}
-
-fn calc_move(opp : Move, out : Outcome) -> Outcome {
-    out
 }
 
 impl Scored for Game {
