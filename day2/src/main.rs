@@ -27,7 +27,7 @@ trait Scored {
 impl FromStr for Move {
     type Err = ();
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: str) -> Result<Self, Self::Err> {
         match s {
             "A" => Ok(Move::Rock),
             "B" => Ok(Move::Paper),
