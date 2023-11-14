@@ -22,10 +22,7 @@ fn main() {
 
     for line in lines_iter {
         let mv = parse_move(&line);    
-        for _ in 0..mv.count {
-            println!("{}, {}, {}", mv.count, mv.from, mv.to);
-            shipyard.move_box(mv.from, mv.to);
-        }
+            shipyard.move_boxes(mv.from, mv.to, mv.count);
     }
 
     for mut stack in shipyard.stacks {
@@ -57,5 +54,11 @@ impl Shipyard {
     fn move_box(&mut self, from : usize, to : usize){
         let bx = self.stacks[from - 1].pop().unwrap();
         self.stacks[to - 1].push(bx);
+    }
+
+    fn move_boxes(&mut self, from : usize, to : usize, count: usize){
+        let l = &self.stacks[from - 1].len();
+        let mut bx = self.stacks[from - 1].split_off(l - count);
+        self.stacks[to - 1].append(&mut bx);
     }
 }
